@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import Base
 
+
 class Owner(Base):
     __tablename__ = "owner"
 
