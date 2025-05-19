@@ -1,10 +1,13 @@
 from fastapi.testclient import TestClient
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Callable
 
 
 def test_create_appointment(
-    client: TestClient, created_test_pet, test_appointment_data_factory
-):
+    client: TestClient,
+    created_test_pet: Dict[str, Any],
+    test_appointment_data_factory: Callable[..., Dict[str, Any]],
+) -> None:
     appointment_dt = datetime.now(timezone.utc) + timedelta(days=5)
     appointment_data = test_appointment_data_factory(
         pet_id=created_test_pet["id"], appointment_time=appointment_dt
@@ -24,7 +27,9 @@ def test_create_appointment(
     )
 
 
-def test_read_appointment(client: TestClient, created_test_appointment):
+def test_read_appointment(
+    client: TestClient, created_test_appointment: Dict[str, Any]
+) -> None:
     appointment_id = created_test_appointment["id"]
     response = client.get(f"/appointments/{appointment_id}")
     assert response.status_code == 200
@@ -33,13 +38,13 @@ def test_read_appointment(client: TestClient, created_test_appointment):
     assert appointment["reason"] == created_test_appointment["reason"]
 
 
-def test_read_appointment_not_found(client: TestClient):
+def test_read_appointment_not_found(client: TestClient) -> None:
     response = client.get("/appointments/99999")
     assert response.status_code == 404
     assert response.json() == {"detail": "Appointment not found"}
 
 
-def test_read_appointments_empty(client: TestClient):
+def test_read_appointments_empty(client: TestClient) -> None:
     response = client.get("/appointments/")
     assert response.status_code == 200
     assert response.json() == []
@@ -47,10 +52,10 @@ def test_read_appointments_empty(client: TestClient):
 
 def test_read_appointments_with_data(
     client: TestClient,
-    created_test_appointment,
-    test_appointment_data_factory,
-    created_test_pet,
-):
+    created_test_appointment: Dict[str, Any],
+    test_appointment_data_factory: Callable[..., Dict[str, Any]],
+    created_test_pet: Dict[str, Any],
+) -> None:
     appointment_data_2 = test_appointment_data_factory(
         pet_id=created_test_pet["id"],
         appointment_time=datetime.now(timezone.utc) + timedelta(days=10),
@@ -67,8 +72,10 @@ def test_read_appointments_with_data(
 
 
 def test_read_appointments_pagination(
-    client: TestClient, test_appointment_data_factory, created_test_pet
-):
+    client: TestClient,
+    test_appointment_data_factory: Callable[..., Dict[str, Any]],
+    created_test_pet: Dict[str, Any],
+) -> None:
     for i in range(5):
         appt_data = test_appointment_data_factory(
             pet_id=created_test_pet["id"],
@@ -89,7 +96,9 @@ def test_read_appointments_pagination(
     assert data_limit_2[0]["id"] != data_skip_2_limit_2[0]["id"]
 
 
-def test_create_appointment_invalid_date_format(client: TestClient, created_test_pet):
+def test_create_appointment_invalid_date_format(
+    client: TestClient, created_test_pet: Dict[str, Any]
+) -> None:
     appointment_data = {
         "pet_id": created_test_pet["id"],
         "appointment_date": "not-a-valid-date",
