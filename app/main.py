@@ -1,13 +1,26 @@
 from fastapi import FastAPI
 from app.routes import pets, owners, appointments
 from app.db.database import engine, Base
-import app.models
-from sqlalchemy import inspect
-from typing import Dict
+from sqlalchemy import inspect, text, Inspector
+from typing import Dict, List, AsyncGenerator
+from contextlib import asynccontextmanager
+from sqlalchemy.exc import OperationalError
 
-app = FastAPI()
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        Base.metadata.create_all(bind=engine)
+        print("Database connected and tables created.")
+    except OperationalError as e:
+        print(f"Database is not available: {e}")
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
@@ -16,8 +29,8 @@ def read_main() -> Dict[str, str]:
 
 
 @app.get("/tables")
-def list_tables():
-    inspector = inspect(engine)
+def list_tables() -> Dict[str, List[str]]:
+    inspector: Inspector = inspect(engine)
     return {"tables": inspector.get_table_names()}
 
 

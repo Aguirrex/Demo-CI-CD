@@ -1,7 +1,12 @@
 from fastapi.testclient import TestClient
+from typing import Any, Dict, Callable
 
 
-def test_create_pet(client: TestClient, created_test_owner, test_pet_data_factory):
+def test_create_pet(
+    client: TestClient,
+    created_test_owner: Dict[str, Any],
+    test_pet_data_factory: Callable[..., Dict[str, Any]],
+) -> None:
     pet_data = test_pet_data_factory(owner_id=created_test_owner["id"])
     pet_data["name"] = "New Buddy"
 
@@ -17,7 +22,7 @@ def test_create_pet(client: TestClient, created_test_owner, test_pet_data_factor
     assert any(p["id"] == created_pet["id"] for p in owner_data["pets"])
 
 
-def test_read_pet(client: TestClient, created_test_pet):
+def test_read_pet(client: TestClient, created_test_pet: Dict[str, Any]) -> None:
     pet_id = created_test_pet["id"]
     response = client.get(f"/pets/{pet_id}")
     assert response.status_code == 200
@@ -26,21 +31,24 @@ def test_read_pet(client: TestClient, created_test_pet):
     assert pet["name"] == created_test_pet["name"]
 
 
-def test_read_pet_not_found(client: TestClient):
+def test_read_pet_not_found(client: TestClient) -> None:
     response = client.get("/pets/99999")
     assert response.status_code == 404
     assert response.json() == {"detail": "Pet not found"}
 
 
-def test_read_pets_empty(client: TestClient):
+def test_read_pets_empty(client: TestClient) -> None:
     response = client.get("/pets/")
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_read_pets_with_data(
-    client: TestClient, created_test_pet, test_pet_data_factory, created_test_owner
-):
+    client: TestClient,
+    created_test_pet: Dict[str, Any],
+    test_pet_data_factory: Callable[..., Dict[str, Any]],
+    created_test_owner: Dict[str, Any],
+) -> None:
     pet_data_2 = test_pet_data_factory(owner_id=created_test_owner["id"])
     pet_data_2["name"] = "Second Pet"
     client.post("/pets/", json=pet_data_2)
@@ -54,8 +62,10 @@ def test_read_pets_with_data(
 
 
 def test_read_pets_pagination(
-    client: TestClient, test_pet_data_factory, created_test_owner
-):
+    client: TestClient,
+    test_pet_data_factory: Callable[..., Dict[str, Any]],
+    created_test_owner: Dict[str, Any],
+) -> None:
     for i in range(5):
         pet_data = test_pet_data_factory(owner_id=created_test_owner["id"])
         pet_data["name"] = f"Paginated Pet {i}"

@@ -1,7 +1,10 @@
 from fastapi.testclient import TestClient
+from typing import Any, Dict, Callable
 
 
-def test_create_owner(client: TestClient, test_owner_data_factory):
+def test_create_owner(
+    client: TestClient, test_owner_data_factory: Callable[..., Dict[str, Any]]
+) -> None:
     owner_data = test_owner_data_factory(email_suffix="_create_owner")
     response = client.post("/owners/", json=owner_data)
     assert response.status_code == 200
@@ -12,7 +15,7 @@ def test_create_owner(client: TestClient, test_owner_data_factory):
     assert created_owner["pets"] == []
 
 
-def test_read_owner(client: TestClient, created_test_owner):
+def test_read_owner(client: TestClient, created_test_owner: Dict[str, Any]) -> None:
     owner_id = created_test_owner["id"]
     response = client.get(f"/owners/{owner_id}")
     assert response.status_code == 200
@@ -21,21 +24,23 @@ def test_read_owner(client: TestClient, created_test_owner):
     assert owner["email"] == created_test_owner["email"]
 
 
-def test_read_owner_not_found(client: TestClient):
+def test_read_owner_not_found(client: TestClient) -> None:
     response = client.get("/owners/99999")
     assert response.status_code == 404
     assert response.json() == {"detail": "Owner not found"}
 
 
-def test_read_owners_empty(client: TestClient):
+def test_read_owners_empty(client: TestClient) -> None:
     response = client.get("/owners/")
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_read_owners_with_data(
-    client: TestClient, created_test_owner, test_owner_data_factory
-):
+    client: TestClient,
+    created_test_owner: Dict[str, Any],
+    test_owner_data_factory: Callable[..., Dict[str, Any]],
+) -> None:
     owner_data_2 = test_owner_data_factory(email_suffix="_owner2")
     client.post("/owners/", json=owner_data_2)
 
@@ -47,7 +52,9 @@ def test_read_owners_with_data(
     assert any(o["email"] == owner_data_2["email"] for o in owners)
 
 
-def test_read_owners_pagination(client: TestClient, test_owner_data_factory):
+def test_read_owners_pagination(
+    client: TestClient, test_owner_data_factory: Callable[..., Dict[str, Any]]
+) -> None:
     for i in range(5):
         client.post(
             "/owners/", json=test_owner_data_factory(email_suffix=f"_page_owner{i}")
