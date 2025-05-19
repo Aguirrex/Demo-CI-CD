@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class PetBase(BaseModel):
@@ -12,7 +12,5 @@ class PetCreate(PetBase):
     pass
 
 class Pet(PetBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-
-    class Config:
-        orm_mode = True

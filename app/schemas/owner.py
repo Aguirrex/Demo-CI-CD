@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from .pet import Pet
 
@@ -11,8 +11,6 @@ class OwnerCreate(OwnerBase):
     pass
 
 class Owner(OwnerBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     pets: List[Pet] = []
-
-    class Config:
-        orm_mode = True
