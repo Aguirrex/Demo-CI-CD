@@ -1,9 +1,10 @@
 from fastapi.testclient import TestClient
 
+
 def test_create_pet(client: TestClient, created_test_owner, test_pet_data_factory):
     pet_data = test_pet_data_factory(owner_id=created_test_owner["id"])
     pet_data["name"] = "New Buddy"
-    
+
     response = client.post("/pets/", json=pet_data)
     assert response.status_code == 200
     created_pet = response.json()
@@ -24,17 +25,22 @@ def test_read_pet(client: TestClient, created_test_pet):
     assert pet["id"] == pet_id
     assert pet["name"] == created_test_pet["name"]
 
+
 def test_read_pet_not_found(client: TestClient):
     response = client.get("/pets/99999")
     assert response.status_code == 404
     assert response.json() == {"detail": "Pet not found"}
+
 
 def test_read_pets_empty(client: TestClient):
     response = client.get("/pets/")
     assert response.status_code == 200
     assert response.json() == []
 
-def test_read_pets_with_data(client: TestClient, created_test_pet, test_pet_data_factory, created_test_owner):
+
+def test_read_pets_with_data(
+    client: TestClient, created_test_pet, test_pet_data_factory, created_test_owner
+):
     pet_data_2 = test_pet_data_factory(owner_id=created_test_owner["id"])
     pet_data_2["name"] = "Second Pet"
     client.post("/pets/", json=pet_data_2)
@@ -46,7 +52,10 @@ def test_read_pets_with_data(client: TestClient, created_test_pet, test_pet_data
     assert any(p["name"] == created_test_pet["name"] for p in pets)
     assert any(p["name"] == pet_data_2["name"] for p in pets)
 
-def test_read_pets_pagination(client: TestClient, test_pet_data_factory, created_test_owner):
+
+def test_read_pets_pagination(
+    client: TestClient, test_pet_data_factory, created_test_owner
+):
     for i in range(5):
         pet_data = test_pet_data_factory(owner_id=created_test_owner["id"])
         pet_data["name"] = f"Paginated Pet {i}"
