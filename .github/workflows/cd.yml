@@ -40,4 +40,4 @@ jobs:
 
             docker logout ghcr.io
 
-          EOF 
+          EOF
