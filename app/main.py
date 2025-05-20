@@ -27,7 +27,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def read_main() -> Dict[str, str]:
-    return {"msg": "app is running"}
+    return {"msg": " my app is running"}
 
 
 @app.get("/tables")
