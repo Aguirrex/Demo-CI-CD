@@ -12,6 +12,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
+        
+        Base.metadata.drop_all(bind=engine, checkfirst=True)
         Base.metadata.create_all(bind=engine)
         print("Database connected and tables created.")
     except OperationalError as e:

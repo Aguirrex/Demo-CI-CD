@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from typing import Generator
+import os
 
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/veterinary_db"
+HOST = os.getenv("DB_HOST", "localhost") 
+DATABASE_URL = f"postgresql://postgres:postgres@{HOST}:5432/veterinary_db"
 
 engine = create_engine(DATABASE_URL)
 

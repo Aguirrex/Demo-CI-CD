@@ -1,0 +1,5 @@
+services:
+  fastapi-app:
+    build: .
+    environment:
+      - DB_HOST=db

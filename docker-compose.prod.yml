@@ -1,0 +1,5 @@
+services:
+  fastapi-app:
+    image: ghcr.io/aguirrex/demo:${TAG}
+    environment:
+      - DB_HOST=db

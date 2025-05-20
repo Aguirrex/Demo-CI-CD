@@ -1,0 +1,13 @@
+services:
+  fastapi-app:
+    container_name: fastapi-app
+    ports:
+      - "8000:8000"
+    networks:
+      - shared-network
+    restart: always
+    stop_signal: SIGINT
+
+networks:
+  shared-network:
+    external: true
